@@ -12,57 +12,56 @@ TIMEZONE = pytz.timezone("Asia/Singapore")
 
 SESSIONS = {
     0: {
-        "day": "Monday",
-        "location": "📍 Fitness corner in Jurong West St 64, Boon Lay, beside Block 685A",
-        "time": "🕕 6:00 PM – 8:00 PM",
+        "location": "Fitness corner in Jurong West St 64, Boon Lay, beside Block 685A",
+        "time": "6pm to 8pm",
     },
     1: {
-        "day": "Tuesday",
-        "location": "📍 Fitness corner beside Hillion Mall, Bukit Panjang",
-        "time": "🕕 6:00 PM – 8:00 PM",
+        "location": "Fitness corner beside Hillion Mall, Bukit Panjang",
+        "time": "6pm to 8pm",
     },
     2: {
-        "day": "Wednesday",
-        "location": "📍 Fitness corner along Waterway Park, Punggol",
-        "time": "🕕 6:00 PM – 8:00 PM",
+        "location": "Fitness corner along Waterway Park, Punggol",
+        "time": "6pm to 8pm",
     },
     3: {
-        "day": "Thursday",
-        "location": "📍 Fitness corner opposite Redhill MRT",
-        "time": "🕕 6:00 PM – 8:00 PM",
+        "location": "Fitness corner opposite Redhill MRT",
+        "time": "6pm to 8pm",
     },
     4: {
-        "day": "Friday",
-        "location": "📍 Fitness corner opposite Ubi MRT",
-        "time": "🕕 6:00 PM – 8:00 PM",
+        "location": "Fitness corner opposite Ubi MRT",
+        "time": "6pm to 8pm",
     },
     5: {
-        "day": "Saturday",
-        "location": "📍 Bukit Canberra ActiveSG",
-        "time": "🕑 2:00 PM – 4:00 PM",
+        "location": "Bukit Canberra ActiveSG",
+        "time": "2pm to 4pm",
     },
 }
 
 async def send_reminder():
     now = datetime.datetime.now(TIMEZONE)
-    tomorrow_weekday = (now.weekday() + 1) % 7
+    tomorrow = now + datetime.timedelta(days=1)
+    tomorrow_weekday = tomorrow.weekday()
 
     if tomorrow_weekday not in SESSIONS:
         return  # No session on Sunday
 
     session = SESSIONS[tomorrow_weekday]
+
+    # Format date as e.g. "27 May 2026"
+    date_str = tomorrow.strftime("%-d %B %Y")
+
     message = (
-        f"🏋️ *Train with us on {session['day']}!*\n\n"
-        f"{session['location']}\n"
-        f"{session['time']}\n"
+        f"Hey everyone! The details for the training session on {date_str} are as follows:\n\n"
+        f"⏰ Time: {session['time']}\n"
+        f"📍 Location: {session['location']}\n"
         f"👕 Attire: Caliversity T-shirt\n\n"
-        f"See you there!"
+        f"See you there fellow Caliversity athletes! 👋\n"
+        f"⬆️ Click on the latest pinned message to view our schedule for the week"
     )
     async with Bot(token=BOT_TOKEN) as bot:
         await bot.send_message(
             chat_id=CHANNEL_ID,
-            text=message,
-            parse_mode="Markdown"
+            text=message
         )
 
 async def main():
