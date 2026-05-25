@@ -3,7 +3,6 @@ import asyncio
 import datetime
 import pytz
 from telegram import Bot
-from telegram.ext import ApplicationBuilder
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -44,7 +43,7 @@ SESSIONS = {
     },
 }
 
-async def send_reminder(bot: Bot):
+async def send_reminder():
     now = datetime.datetime.now(TIMEZONE)
     tomorrow_weekday = (now.weekday() + 1) % 7
 
@@ -59,33 +58,25 @@ async def send_reminder(bot: Bot):
         f"👕 Attire: Caliversity T-shirt\n\n"
         f"See you there!"
     )
-    await bot.send_message(
-        chat_id=CHANNEL_ID,
-        text=message,
-        parse_mode="Markdown"
-    )
+    async with Bot(token=BOT_TOKEN) as bot:
+        await bot.send_message(
+            chat_id=CHANNEL_ID,
+            text=message,
+            parse_mode="Markdown"
+        )
 
-def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-
+async def main():
     scheduler = AsyncIOScheduler(timezone=TIMEZONE)
     scheduler.add_job(
         send_reminder,
         trigger="cron",
         hour=22,
         minute=0,
-        args=[app.bot],
     )
-
-    async def run():
-        await app.initialize()
-        await app.start()
-        scheduler.start()
-        print("Bot is running. Reminders scheduled at 10:00 PM SGT nightly.")
-        while True:
-            await asyncio.sleep(3600)
-
-    asyncio.run(run())
+    scheduler.start()
+    print("Bot is running. Reminders scheduled at 10:00 PM SGT nightly.")
+    while True:
+        await asyncio.sleep(3600)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
