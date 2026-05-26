@@ -12,28 +12,40 @@ TIMEZONE = pytz.timezone("Asia/Singapore")
 
 SESSIONS = {
     0: {
-        "location": "Fitness corner in Jurong West St 64, Boon Lay, beside Block 685A",
+        "location": "The fitness corner in Jurong West St 64, Boon Lay, beside Block 685A",
         "time": "6pm to 8pm",
+        "image": "https://i.imgur.com/tlnktiR.jpg",
+        "session_image": "https://i.imgur.com/j54XpmW.jpg",
     },
     1: {
-        "location": "Fitness corner beside Hillion Mall, Bukit Panjang",
+        "location": "The fitness corner beside Hillion Mall, Bukit Panjang",
         "time": "6pm to 8pm",
+        "image": "https://i.imgur.com/tx5F3UY.jpg",
+        "session_image": "https://i.imgur.com/M4DbOOv.jpg",
     },
     2: {
-        "location": "Fitness corner along Waterway Park, Punggol",
+        "location": "The calisthenics park along Punggol Waterway Point",
         "time": "6pm to 8pm",
+        "image": "https://i.imgur.com/gXITNTF.jpg",
+        "session_image": "https://i.imgur.com/ugsSZRB.jpg",
     },
     3: {
-        "location": "Fitness corner opposite Redhill MRT",
+        "location": "The fitness corner opposite Redhill MRT",
         "time": "6pm to 8pm",
+        "image": "https://i.imgur.com/1saAz2U.jpg",
+        "session_image": "https://i.imgur.com/JcLnaMV.jpg",
     },
     4: {
-        "location": "Fitness corner opposite Ubi MRT",
+        "location": "The fitness corner opposite Ubi MRT",
         "time": "6pm to 8pm",
+        "image": "https://i.imgur.com/qWJddaT.jpg",
+        "session_image": "https://i.imgur.com/Lb8nbtc.jpg",
     },
     5: {
-        "location": "Bukit Canberra ActiveSG",
+        "location": "Bukit Canberra ActiveSG Gym",
         "time": "2pm to 4pm",
+        "image": "https://i.imgur.com/5wgCJOh.jpg",
+        "session_image": "https://i.imgur.com/TvmnXZH.jpg",
     },
 }
 
@@ -48,7 +60,7 @@ async def send_reminder():
     session = SESSIONS[tomorrow_weekday]
     date_str = tomorrow.strftime("%-d %B %Y")
 
-    message = (
+    caption = (
         f"Hey everyone! The details for the training session on {date_str} are as follows:\n\n"
         f"⏰ Time: {session['time']}\n"
         f"📍 Location: {session['location']}\n"
@@ -56,8 +68,17 @@ async def send_reminder():
         f"See you there fellow Caliversity athletes! 👋\n"
         f"⬆️ Click on the latest pinned message to view our schedule for the week"
     )
+
     async with Bot(token=BOT_TOKEN) as bot:
-        await bot.send_message(chat_id=CHANNEL_ID, text=message)
+        image_url = session.get("image")
+        if image_url:
+            await bot.send_photo(
+                chat_id=CHANNEL_ID,
+                photo=image_url,
+                caption=caption
+            )
+        else:
+            await bot.send_message(chat_id=CHANNEL_ID, text=caption)
 
 async def send_session_started():
     now = datetime.datetime.now(TIMEZONE)
@@ -67,12 +88,16 @@ async def send_session_started():
         return
 
     session = SESSIONS[today_weekday]
-    message = (
+    caption = (
         f"Our session at {session['location']} has begun! 🏃🏻‍♂️\n"
         f"See you if you're coming to train 🙌!"
     )
     async with Bot(token=BOT_TOKEN) as bot:
-        await bot.send_message(chat_id=CHANNEL_ID, text=message)
+        await bot.send_photo(
+            chat_id=CHANNEL_ID,
+            photo=session["session_image"],
+            caption=caption
+        )
 
 async def send_weekly_schedule():
     now = datetime.datetime.now(TIMEZONE)
@@ -154,7 +179,7 @@ async def main():
     scheduler.add_job(
         send_reminder,
         trigger="cron",
-        hour=22,
+        hour=20,
         minute=0,
     )
 
