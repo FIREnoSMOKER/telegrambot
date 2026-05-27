@@ -14,38 +14,26 @@ SESSIONS = {
     0: {
         "location": "The fitness corner in Jurong West St 64, Boon Lay, beside Block 685A",
         "time": "6pm to 8pm",
-        "image": "https://i.imgur.com/tlnktiR.jpg",
-        "session_image": "https://i.imgur.com/j54XpmW.jpg",
     },
     1: {
         "location": "The fitness corner beside Hillion Mall, Bukit Panjang",
         "time": "6pm to 8pm",
-        "image": "https://i.imgur.com/tx5F3UY.jpg",
-        "session_image": "https://i.imgur.com/M4DbOOv.jpg",
     },
     2: {
         "location": "The calisthenics park along Punggol Waterway Point",
         "time": "6pm to 8pm",
-        "image": "https://i.imgur.com/gXITNTF.jpg",
-        "session_image": "https://i.imgur.com/ugsSZRB.jpg",
     },
     3: {
         "location": "The fitness corner opposite Redhill MRT",
         "time": "6pm to 8pm",
-        "image": "https://i.imgur.com/1saAz2U.jpg",
-        "session_image": "https://i.imgur.com/JcLnaMV.jpg",
     },
     4: {
         "location": "The fitness corner opposite Ubi MRT",
         "time": "6pm to 8pm",
-        "image": "https://i.imgur.com/qWJddaT.jpg",
-        "session_image": "https://i.imgur.com/Lb8nbtc.jpg",
     },
     5: {
         "location": "Bukit Canberra ActiveSG Gym",
         "time": "2pm to 4pm",
-        "image": "https://i.imgur.com/5wgCJOh.jpg",
-        "session_image": "https://i.imgur.com/TvmnXZH.jpg",
     },
 }
 
@@ -60,7 +48,7 @@ async def send_reminder():
     session = SESSIONS[tomorrow_weekday]
     date_str = tomorrow.strftime("%-d %B %Y")
 
-    caption = (
+    message = (
         f"Hey everyone! The details for the training session on {date_str} are as follows:\n\n"
         f"⏰ Time: {session['time']}\n"
         f"📍 Location: {session['location']}\n"
@@ -70,15 +58,7 @@ async def send_reminder():
     )
 
     async with Bot(token=BOT_TOKEN) as bot:
-        image_url = session.get("image")
-        if image_url:
-            await bot.send_photo(
-                chat_id=CHANNEL_ID,
-                photo=image_url,
-                caption=caption
-            )
-        else:
-            await bot.send_message(chat_id=CHANNEL_ID, text=caption)
+        await bot.send_message(chat_id=CHANNEL_ID, text=message)
 
 async def send_session_started():
     now = datetime.datetime.now(TIMEZONE)
@@ -88,16 +68,12 @@ async def send_session_started():
         return
 
     session = SESSIONS[today_weekday]
-    caption = (
+    message = (
         f"Our session at {session['location']} has begun! 🏃🏻‍♂️\n"
         f"See you if you're coming to train 🙌!"
     )
     async with Bot(token=BOT_TOKEN) as bot:
-        await bot.send_photo(
-            chat_id=CHANNEL_ID,
-            photo=session["session_image"],
-            caption=caption
-        )
+        await bot.send_message(chat_id=CHANNEL_ID, text=message)
 
 async def send_weekly_schedule():
     now = datetime.datetime.now(TIMEZONE)
